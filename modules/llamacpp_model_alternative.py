@@ -58,8 +58,54 @@ class LlamaCppModel:
         return output.decode()
 
     def generate_with_streaming(self, **kwargs):
+        print(kwargs)
         with Iteratorize(self.generate, kwargs, callback=None) as generator:
             reply = ''
             for token in generator:
                 reply += token
                 yield reply
+
+
+from modules.ggml.ggmlTextModel import ggmlTextModel
+import os
+
+class GPTNeoXCppModel:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def from_pretrained(self, path):
+        result = self()
+
+        params = {
+            'model_path': str(path),
+            'n_threads': shared.args.threads or None,
+            'n_batch': shared.args.n_batch,
+            'model_type': "stablelm"
+        }
+
+        self.model = ggmlTextModel()
+        self.model.setting("/".join(os.path.realpath(__file__).split("/")[0:-2])+"/"+params["model_path"], params["n_threads"], params["n_batch"], params["model_type"])
+
+        # This is ugly, but the model and the tokenizer are the same object in this library.
+        return result, result
+    
+    def encode(self, string):
+        return self.model.encode(string)
+    
+    def generate(self, context="", token_count=20, temperature=1, top_p=1, top_k=50, repetition_penalty=1.2, callback=None):
+        output = ""
+        for text in self.model.generate(n_predict=token_count, top_p=top_p, top_k=top_k, temperature=temperature, seed=-1, repeat_penalty=repetition_penalty, prompt=context):
+            if (shared.stop_everything):
+                self.model.quit()
+            output += text
+
+        return output
+
+    def generate_with_streaming(self, **kwargs):
+        reply = ""
+        for text in self.model.generate(n_predict=kwargs["token_count"], top_p=kwargs["top_p"], top_k=kwargs["top_k"], temperature=kwargs["temperature"], seed=-1, repeat_penalty=kwargs["repetition_penalty"], prompt=kwargs["context"]):
+            if (shared.stop_everything):
+                self.model.quit()
+            reply += text
+            yield reply

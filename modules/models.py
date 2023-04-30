@@ -44,8 +44,22 @@ def find_model_type(model_name):
     if 'rwkv-' in model_name_lower:
         return 'rwkv'
     elif len(list(Path(f'{shared.args.model_dir}/{model_name}').glob('*ggml*.bin'))) > 0:
+        if ('stablelm' in model_name_lower):
+            return 'gptneoxcpp'
+        elif ('polyglot' in model_name_lower):
+            return 'gptneoxcpp'
+        elif ('gptneox' in model_name_lower):
+            return 'gptneoxcpp'
+
         return 'llamacpp'
     elif re.match('.*ggml.*\.bin', model_name_lower):
+        if ('stablelm' in model_name_lower):
+            return 'gptneoxcpp'
+        elif ('polyglot' in model_name_lower):
+            return 'gptneoxcpp'
+        elif ('gptneox' in model_name_lower):
+            return 'gptneoxcpp'
+
         return 'llamacpp'
     elif 'chatglm' in model_name_lower:
         return 'chatglm'
@@ -139,6 +153,19 @@ def load_model(model_name):
 
         print(f"llama.cpp weights detected: {model_file}\n")
         model, tokenizer = LlamaCppModel.from_pretrained(model_file)
+        return model, tokenizer
+    
+    elif shared.model_type == 'gptneoxcpp':
+        from modules.llamacpp_model_alternative import GPTNeoXCppModel
+
+        path = Path(f'{shared.args.model_dir}/{model_name}')
+        if path.is_file():
+            model_file = path
+        else:
+            model_file = list(Path(f'{shared.args.model_dir}/{model_name}').glob('*ggml*.bin'))[0]
+
+        print(f"GPTNeoXcpp weights detected: {model_file}\n")
+        model, tokenizer = GPTNeoXCppModel.from_pretrained(model_file)
         return model, tokenizer
 
     # Quantized model
