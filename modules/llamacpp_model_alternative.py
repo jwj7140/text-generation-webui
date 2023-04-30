@@ -91,10 +91,14 @@ class GPTNeoXCppModel:
         return result, result
     
     def encode(self, string):
+        if (string == ""):
+            return []
         return self.model.encode(string)
     
-    def generate(self, context="", token_count=20, temperature=1, top_p=1, top_k=50, repetition_penalty=1.2, callback=None):
+    def generate(self, context=".", token_count=20, temperature=1, top_p=1, top_k=50, repetition_penalty=1.2, callback=None):
         output = ""
+        if (context == ""):
+            context = "."
         print({"context":context, "token_count":token_count, "temperature":temperature, "top_p":top_p, "top_k":top_k, "repetition_penalty":repetition_penalty})
         for text in self.model.generate(n_predict=token_count, top_p=top_p, top_k=top_k, temperature=temperature, seed=-1, repeat_penalty=repetition_penalty, prompt=context):
             if (shared.stop_everything):
@@ -105,6 +109,8 @@ class GPTNeoXCppModel:
 
     def generate_with_streaming(self, **kwargs):
         reply = ""
+        if (kwargs["context"] == ""):
+            kwargs["context"] = "."
         print({"context":kwargs["context"], "token_count":kwargs["token_count"], "temperature":kwargs["temperature"], "top_p":kwargs["top_p"], "top_k":kwargs["top_k"], "repetition_penalty":kwargs["repetition_penalty"]})
         for text in self.model.generate(n_predict=kwargs["token_count"], top_p=kwargs["top_p"], top_k=kwargs["top_k"], temperature=kwargs["temperature"], seed=-1, repeat_penalty=kwargs["repetition_penalty"], prompt=kwargs["context"]):
             if (shared.stop_everything):
