@@ -105,7 +105,7 @@ class GPTNeoXCppModel:
 
     def generate_with_streaming(self, **kwargs):
         reply = ""
-        print({"context":context, "token_count":token_count, "temperature":temperature, "top_p":top_p, "top_k":top_k, "repetition_penalty":repetition_penalty})
+        print({"context":kwargs["context"], "token_count":kwargs["token_count"], "temperature":kwargs["temperature"], "top_p":kwargs["top_p"], "top_k":kwargs["top_k"], "repetition_penalty":kwargs["repetition_penalty"]})
         for text in self.model.generate(n_predict=kwargs["token_count"], top_p=kwargs["top_p"], top_k=kwargs["top_k"], temperature=kwargs["temperature"], seed=-1, repeat_penalty=kwargs["repetition_penalty"], prompt=kwargs["context"]):
             if (shared.stop_everything):
                 self.model.quit()
