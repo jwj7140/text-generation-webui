@@ -95,6 +95,7 @@ class GPTNeoXCppModel:
     
     def generate(self, context="", token_count=20, temperature=1, top_p=1, top_k=50, repetition_penalty=1.2, callback=None):
         output = ""
+        print({"context":context, "token_count":token_count, "temperature":temperature, "top_p":top_p, "top_k":top_k, "repetition_penalty":repetition_penalty})
         for text in self.model.generate(n_predict=token_count, top_p=top_p, top_k=top_k, temperature=temperature, seed=-1, repeat_penalty=repetition_penalty, prompt=context):
             if (shared.stop_everything):
                 self.model.quit()
