@@ -33,7 +33,7 @@ class LlamaCppModel:
         # This is ugly, but the model and the tokenizer are the same object in this library.
         return result, result
 
-    def encode(self, string):
+    def encode(self, string, return_tensors, add_special_tokens):
         if type(string) is str:
             string = string.encode()
         return self.model.tokenize(string)

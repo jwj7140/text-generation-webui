@@ -24,7 +24,7 @@ def get_max_prompt_length(state):
 
 
 def encode(prompt, add_special_tokens=True, add_bos_token=True, truncation_length=None):
-    if shared.model_type in ['rwkv', 'llamacpp']:
+    if shared.model_type in ['rwkv', 'llamacpp', 'gptneoxcpp']:
         input_ids = shared.tokenizer.encode(str(prompt))
         input_ids = np.array(input_ids).reshape(1, len(input_ids))
         return input_ids
@@ -44,7 +44,7 @@ def encode(prompt, add_special_tokens=True, add_bos_token=True, truncation_lengt
     if truncation_length is not None:
         input_ids = input_ids[:, -truncation_length:]
 
-    if shared.model_type in ['rwkv', 'llamacpp'] or shared.args.cpu:
+    if shared.model_type in ['rwkv', 'llamacpp', 'gptneoxcpp'] or shared.args.cpu:
         return input_ids
     elif shared.args.flexgen:
         return input_ids.numpy()
@@ -143,7 +143,7 @@ def get_generate_params(state):
     generate_params = {}
 
     # Models that are not on transformers
-    if shared.model_type in ['rwkv', 'llamacpp']:
+    if shared.model_type in ['rwkv', 'llamacpp', 'gptneoxcpp']:
         generate_params['token_count'] = state['max_new_tokens']
         for k in ['temperature', 'top_p', 'top_k', 'repetition_penalty']:
             generate_params[k] = state[k]
@@ -192,7 +192,7 @@ def generate_reply(question, state, eos_token=None, stopping_strings=[]):
 
     # If the model is not on transformers, handle it separately and end this
     # function call earlier.
-    if shared.model_type in ['rwkv', 'llamacpp']:
+    if shared.model_type in ['rwkv', 'llamacpp', 'gptneoxcpp']:
         if shared.args.verbose:
             print(f'\n\n{question}\n--------------------\n')
 
