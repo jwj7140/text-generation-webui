@@ -89,7 +89,6 @@ class GPTNeoXCppModel:
 
         # This is ugly, but the model and the tokenizer are the same object in this library.
         return result, result
-    
     def encode(self, string):
         if (string == ""):
             return []
